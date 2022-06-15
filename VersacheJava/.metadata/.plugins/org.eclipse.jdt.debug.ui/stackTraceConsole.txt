@@ -1,0 +1,14 @@
+tring buf = "Fecha;Mes;Base;IVA;Total";
+        System.out.println(buf);
+        //FIXME: WTF
+        out.format(buf);
+        while (rs.next()) {
+        	currentNoIva = rs.getDouble(2);
+        	currentIva = rs.getDouble(3);
+        	if (dia != Integer.parseInt(rs.getString(1).split(" ")[0].split("-")[2])) {
+        		buf = String.format("%s;%s;%.2f;%.2f;%.2f\n", rs.getString(1).split(" ")[0], rs.getString(1).split(" ")[0].split("-")[1], diaNoIva, diaNoIva*0.1, diaIva);
+        		out.format(buf);
+        		System.out.println(buf);
+        		diaNoIva = 0;
+        		diaIva = 0;
+        	}

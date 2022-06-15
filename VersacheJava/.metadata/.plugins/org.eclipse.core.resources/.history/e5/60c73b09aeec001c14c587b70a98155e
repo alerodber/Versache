@@ -1,0 +1,12 @@
+import java.util.Scanner;
+import java.util.LinkedList;
+
+public class Menu {
+	
+	private LinkedList<String> options;
+	
+	public Menu (String title, String prompt) {
+		
+	}
+	
+}

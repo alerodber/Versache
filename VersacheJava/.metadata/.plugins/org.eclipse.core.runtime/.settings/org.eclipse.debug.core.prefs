@@ -1,0 +1,2 @@
+eclipse.preferences.version=1
+prefWatchExpressions=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<watchExpressions>\r\n    <expression enabled\="true" text\="dia"/>\r\n    <expression enabled\="true" text\="rs.getString(1).split(&quot; &quot;)[0].split(&quot;-&quot;)[1]"/>\r\n    <expression enabled\="true" text\="diaNoIva"/>\r\n    <expression enabled\="true" text\="diaIva"/>\r\n</watchExpressions>\r\n

@@ -1,0 +1,20 @@
+import java.util.Scanner;
+import java.util.LinkedList;
+
+public class Menu {
+	
+	private LinkedList<String> options;
+	
+	public Menu (String title, String prompt) {
+		this.options = new LinkedList<String> ();
+	}
+	
+	public boolean add (String option) {
+		if (this.options.contains(option)) {
+			return false;
+		}
+		this.options.add(option);
+		return true;
+	}
+	
+}

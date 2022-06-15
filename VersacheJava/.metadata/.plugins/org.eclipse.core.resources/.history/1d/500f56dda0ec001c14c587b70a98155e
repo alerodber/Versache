@@ -1,0 +1,137 @@
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Formatter;
+import java.util.Scanner;
+
+public class VersacheJava {
+    // MUY IMPORTANTE: Poner las credenciales del laboratorio.
+    private static String USUARIO = "alexrb";
+    private static String PASSWORD = "10770849";
+    // Nombre de la base de datos
+    private static String NOMBRE_BASEDATOS = "versache";
+    // Conexion con la base de datos
+    private static String STRING_CONEXION = "jdbc:postgresql://alexrl.ddns.net:5432/" + NOMBRE_BASEDATOS;
+
+    public static void main(String[] args) {
+        try {
+            getVentasMes();
+        } catch (SQLException e) { // Tratamiento por Excepcion
+            e.printStackTrace();
+        } catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+
+    public static void getVentasMes() throws SQLException, IOException {
+        Connection con = getConexion();
+
+        // Crear la consulta SQL
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT create_date AS date, price_subtotal AS price, price_subtotal_incl AS total ");
+        query.append("FROM pos_order_line ");
+        query.append("WHERE EXTRACT (MONTH ");
+        query.append("FROM pos_order_line.create_date) = ? ");
+        query.append("AND EXTRACT (YEAR ");
+        query.append("FROM pos_order_line.create_date) = ? ");
+        query.append("ORDER BY pos_order_line.create_date");
+
+        PreparedStatement st = con.prepareStatement(query.toString());
+        System.out.println("Introduce el mes: ");
+        int mes = LeerInt();
+        System.out.println("Introduce el anno: ");
+        int anno = LeerInt();
+        st.setInt(1, mes);
+        st.setInt(2, anno);
+        ResultSet rs = st.executeQuery();
+        //presentaResultados(rs);
+
+        double diaNoIva = 0;
+        double diaIva = 0;
+        
+        double totalNoIva = 0;
+        double totalIva = 0;
+        
+        double currentNoIva;
+        double currentIva;
+        
+        int dia = 0;
+
+        Formatter out = new Formatter (String.format("Ventas_%d_%d.csv", mes, anno));
+        System.out.println("Fecha\t\tMes\tBase\tIVA\tTotal");
+        //FIXME: WTF
+       
+        //out.format("%s;%s;%s\n","FECHA","BASE","TOTAL");
+        while (rs.next()) {
+        	currentNoIva = rs.getDouble(2);
+        	currentIva = rs.getDouble(3);
+        	if (dia != Integer.parseInt(rs.getString(1).split(" ")[0].split("-")[2])) {
+        		out.format("%s;%.2f;%.2f\n", rs.getString(1).split(" ")[0], diaNoIva, diaIva);
+        		System.out.printf("%s\t%s\t%.2f\t%.2f\t%.2f\n", rs.getString(1).split(" ")[0], diaNoIva, diaIva);
+        		diaNoIva = 0;
+        		diaIva = 0;
+        	}
+        	diaNoIva+=currentNoIva;
+        	diaIva+=currentIva;
+        	totalNoIva+=currentNoIva;
+        	totalIva+=currentIva;
+        	dia = Integer.parseInt(rs.getString(1).split(" ")[0].split("-")[2]);
+        }
+        
+        System.out.printf("TOTAL ~>\t%.2f\t%.2f\n", totalNoIva, totalIva);
+        out.format("TOTAL ~>;%.2f;%.2f\n", totalNoIva, totalIva);
+        if (out != null) {
+        	out.close();
+        }
+        rs.close();
+        st.close();
+        con.close();
+    }
+
+    private static Connection getConexion() throws SQLException {
+
+        return DriverManager.getConnection(STRING_CONEXION, USUARIO, PASSWORD);
+    }
+
+    /**
+     * Metodo para procesar el resultado de ResultSet
+     * 
+     * @throws SQLException
+     */
+    private static void presentaResultados(ResultSet rs) throws SQLException {
+        int numeroColumnas = rs.getMetaData().getColumnCount();
+        StringBuilder headers = new StringBuilder();
+
+        for (int i = 1; i < numeroColumnas; i++)
+            headers.append(rs.getMetaData().getColumnName(i) + "\t");
+        headers.append(rs.getMetaData().getColumnName(numeroColumnas));
+
+        System.out.println(headers.toString());
+        StringBuilder result = null;
+
+        while (rs.next()) {
+            result = new StringBuilder();
+            for (int i = 1; i < numeroColumnas; i++)
+                result.append(rs.getObject(i) + "\t");
+            result.append(rs.getObject(numeroColumnas));
+            System.out.println(result.toString());
+        }
+
+        if (result == null)
+            System.out.println("No hay datos");
+    }
+
+    @SuppressWarnings("resource")
+    private static String LeerString() {
+        return new Scanner(System.in).nextLine();
+    }
+
+    @SuppressWarnings("resource")
+    private static int LeerInt() {
+        return new Scanner(System.in).nextInt();
+    }
+}

@@ -1,0 +1,47 @@
+import java.util.Scanner;
+import java.util.LinkedList;
+
+public class Menu {
+	
+	private LinkedList<String> options;
+	private String title;
+	private String prompt;
+	
+	public Menu (String title, String prompt) {
+		this.options = new LinkedList<String> ();
+		this.title = title;
+		this.prompt = prompt;
+	}
+	
+	public boolean add (String option) {
+		if (this.options.contains(option)) {
+			return false;
+		}
+		this.options.add(option);
+		return true;
+	}
+	
+	private void showOptions () {
+		int i = 0;
+		System.out.println(this.title);
+		for (String option : this.options) {
+			System.out.printf("%d. %s\n", i++, option);
+		}
+	}
+
+	public int runSelection () {
+		Scanner in = Scanner (System.in);
+		this.showOptions();
+		System.out.println(this.prompt);
+		int out = 0;
+		int i = 0;
+		do {
+			out = in.nextInt();
+			if (i++%3==0) {
+				
+			}
+		} while (out != this.options.size());
+		return out;
+	}
+	
+}
